@@ -382,7 +382,13 @@ h1 {
   .cube-tools {
     right: 50%;
     bottom: 22px;
+    gap: 5px;
     transform: translateX(50%);
+  }
+
+  .tool-button {
+    width: 40px;
+    height: 40px;
   }
 
   .toast {

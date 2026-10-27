@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { TrackballControls } from "three/addons/controls/TrackballControls.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import "./style.css";
 
@@ -9,6 +9,8 @@ const hint = document.querySelector("#interaction-hint");
 const undoButton = document.querySelector("#undo");
 const resetButton = document.querySelector("#reset");
 const shuffleButton = document.querySelector("#shuffle");
+const zoomInButton = document.querySelector("#zoom-in");
+const zoomOutButton = document.querySelector("#zoom-out");
 const toast = document.querySelector("#toast");
 
 const scene = new THREE.Scene();
@@ -30,15 +32,14 @@ renderer.toneMappingExposure = 1.1;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.enablePan = false;
+const controls = new TrackballControls(camera, canvas);
+controls.noPan = true;
+controls.staticMoving = false;
+controls.dynamicDampingFactor = 0.08;
+controls.rotateSpeed = 3;
 controls.minDistance = 8;
 controls.maxDistance = 18;
 controls.target.set(0, 0, 0);
-controls.autoRotate = true;
-controls.autoRotateSpeed = 0.55;
 
 scene.add(new THREE.HemisphereLight("#ffffff", "#86847c", 2.1));
 
@@ -159,6 +160,8 @@ let activeHit = null;
 let rotating = false;
 let moveHistory = [];
 let toastTimer;
+let autoRotate = true;
+let previousFrameTime = 0;
 
 function updateButtons() {
   undoButton.disabled = rotating || moveHistory.length === 0;
@@ -173,15 +176,28 @@ function showToast(message) {
   toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 1300);
 }
 
+function zoomCamera(factor) {
+  const offset = camera.position.clone().sub(controls.target);
+  const distance = THREE.MathUtils.clamp(
+    offset.length() * factor,
+    controls.minDistance,
+    controls.maxDistance,
+  );
+  camera.position.copy(controls.target).add(offset.setLength(distance));
+  controls.update();
+}
+
+zoomInButton.addEventListener("click", () => zoomCamera(0.8));
+zoomOutButton.addEventListener("click", () => zoomCamera(1.25));
+
 function setMode(nextMode) {
   mode = nextMode;
   controls.enabled = mode === "explore";
-  controls.autoRotate = mode === "explore";
   canvas.style.cursor = mode === "solve" ? "crosshair" : "grab";
   hint.textContent =
     mode === "explore"
       ? "Arraste para girar · role para aproximar"
-      : "Arraste uma peça na direção do movimento";
+      : "Arraste uma peça na direção do giro desejado";
 
   document.querySelectorAll(".mode-button").forEach((button) => {
     const isActive = button.dataset.mode === mode;
@@ -221,20 +237,28 @@ function resolveSwipeMove(event) {
 
   const cameraRight = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
   const cameraUp = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
-  const dragDirection = cameraRight.multiplyScalar(dx).add(cameraUp.multiplyScalar(-dy)).normalize();
+  const dragDirection = cameraRight.multiplyScalar(dx).add(cameraUp.multiplyScalar(-dy));
   const faceNormal = worldFaceNormal(activeHit);
-  const axisVector = new THREE.Vector3().crossVectors(faceNormal, dragDirection);
+  const cubeRotation = cubeRoot.getWorldQuaternion(new THREE.Quaternion());
+  dragDirection.addScaledVector(faceNormal, -dragDirection.dot(faceNormal));
+  if (dragDirection.lengthSq() < 1e-6) return null;
 
-  axisVector.applyQuaternion(cubeRoot.getWorldQuaternion(new THREE.Quaternion()).invert());
-  const axis = dominantAxis(axisVector);
-  const sign = Math.sign(axisVector[axis]) || 1;
+  const cubeCenter = cubeRoot.getWorldPosition(new THREE.Vector3());
+  const radial = activeHit.point.clone().sub(cubeCenter);
+  const localRotationAxis = new THREE.Vector3()
+    .crossVectors(radial, dragDirection)
+    .applyQuaternion(cubeRotation.invert());
+  if (localRotationAxis.lengthSq() < 1e-6) return null;
+
+  const axis = dominantAxis(localRotationAxis);
   const cubie = activeHit.object.userData.cubie;
   const layer = Math.round(cubie.userData.coord[axis]);
-  return { axis, layer, direction: sign };
+  const direction = Math.sign(localRotationAxis[axis]) || 1;
+  return { axis, layer, direction };
 }
 
 canvas.addEventListener("pointerdown", (event) => {
-  controls.autoRotate = false;
+  autoRotate = false;
   if (mode !== "solve" || rotating) return;
 
   const hit = getPointerHit(event);
@@ -373,6 +397,17 @@ resize();
 updateButtons();
 
 function render() {
+  const now = performance.now();
+  const delta = previousFrameTime ? Math.min((now - previousFrameTime) / 1000, 0.05) : 0;
+  previousFrameTime = now;
+  if (autoRotate && mode === "explore") {
+    const rotation = new THREE.Quaternion().setFromAxisAngle(
+      new THREE.Vector3(0, 1, 0),
+      delta * 0.0576,
+    );
+    camera.position.sub(controls.target).applyQuaternion(rotation).add(controls.target);
+    camera.up.applyQuaternion(rotation);
+  }
   controls.update();
   renderer.render(scene, camera);
   requestAnimationFrame(render);
