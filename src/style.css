@@ -44,9 +44,11 @@ a {
   align-items: center;
   justify-content: space-between;
   padding: 24px clamp(22px, 4vw, 64px);
+  pointer-events: none;
 }
 
 .brand {
+  pointer-events: auto;
   display: inline-flex;
   align-items: center;
   gap: 11px;
@@ -79,28 +81,6 @@ a {
 
 .brand-mark i:nth-child(4) {
   background: var(--green);
-}
-
-.buy-button,
-.primary-button {
-  display: inline-flex;
-  min-height: 46px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--ink);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.buy-button {
-  padding: 0 21px;
-  background: transparent;
-  transition: background 180ms ease, color 180ms ease;
-}
-
-.buy-button:hover {
-  background: var(--ink);
-  color: white;
 }
 
 .hero {
@@ -145,23 +125,25 @@ h1 {
   line-height: 1.65;
 }
 
-.primary-button {
-  gap: 28px;
-  padding: 0 22px;
-  background: var(--ink);
-  color: white;
-  transition: transform 180ms ease;
-}
-
-.primary-button:hover {
-  transform: translateY(-2px);
-}
-
 .experience {
   position: relative;
   min-height: 620px;
   overflow: hidden;
   background: #deddd7;
+}
+
+body.is-cube-focused {
+  overflow: hidden;
+}
+
+.experience.is-focused {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
 }
 
 #cube-canvas {
@@ -174,6 +156,43 @@ h1 {
 
 #cube-canvas:active {
   cursor: grabbing;
+}
+
+.focus-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 24px;
+  right: 24px;
+  display: inline-flex;
+  min-width: 88px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid rgba(17, 17, 15, 0.13);
+  background: rgba(245, 244, 239, 0.9);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  backdrop-filter: blur(12px);
+}
+
+.focus-toggle svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.focus-toggle:hover {
+  background: var(--ink);
+  color: white;
 }
 
 .mode-switch {
@@ -223,6 +242,26 @@ h1 {
 .mode-button.is-active {
   background: var(--ink);
   color: white;
+}
+
+.experience.is-focused .mode-switch {
+  top: auto;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  left: max(20px, env(safe-area-inset-left));
+  padding: 6px;
+  transform: none;
+}
+
+.experience.is-focused .mode-button {
+  height: 48px;
+  padding: 0 20px;
+  font-size: 14px;
+}
+
+.experience.is-focused .cube-tools,
+.experience.is-focused .interaction-hint,
+.experience.is-focused .toast {
+  display: none;
 }
 
 .cube-tools {
@@ -328,17 +367,11 @@ h1 {
 
 @media (max-width: 860px) {
   .site-header {
-    padding: 19px 20px;
+    padding: 16px 20px;
   }
 
   .brand {
     font-size: 12px;
-  }
-
-  .buy-button {
-    min-height: 40px;
-    padding: 0 15px;
-    font-size: 11px;
   }
 
   .hero {
@@ -347,8 +380,8 @@ h1 {
   }
 
   .copy {
-    min-height: 490px;
-    padding: 118px 24px 54px;
+    min-height: 0;
+    padding: 112px 24px 48px;
   }
 
   h1 {
@@ -363,11 +396,18 @@ h1 {
   }
 
   .experience {
-    min-height: min(690px, 82svh);
+    min-height: clamp(420px, 76svh, 620px);
+  }
+
+  .focus-toggle {
+    top: max(14px, env(safe-area-inset-top));
+    right: 14px;
+    min-width: 82px;
+    height: 44px;
   }
 
   .mode-switch {
-    top: 20px;
+    top: max(14px, env(safe-area-inset-top));
   }
 
   .interaction-hint {
@@ -381,25 +421,108 @@ h1 {
 
   .cube-tools {
     right: 50%;
-    bottom: 22px;
-    gap: 5px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    gap: 4px;
     transform: translateX(50%);
   }
 
   .tool-button {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .tool-button--wide {
+    padding: 0 11px;
   }
 
   .toast {
-    top: 76px;
+    top: 66px;
   }
 }
 
 @media (max-width: 520px) {
+  .site-header {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .brand {
+    gap: 8px;
+    font-size: 10px;
+  }
+
+  .brand-mark {
+    width: 20px;
+    height: 20px;
+  }
+
+  .copy {
+    padding: 104px 20px 42px;
+  }
+
+  h1 {
+    font-size: clamp(52px, 15vw, 72px);
+  }
+
+  .intro {
+    margin: 20px 0 24px;
+  }
+
+  .experience {
+    min-height: clamp(400px, 72svh, 560px);
+  }
+
+  .mode-button {
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .mode-label {
+    display: none;
+  }
+
+  .experience.is-focused .mode-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  .interaction-hint {
+    bottom: 76px;
+    width: calc(100% - 32px);
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
   .purchase {
     align-items: flex-start;
     flex-direction: column;
+    gap: 18px;
+    padding: 36px 20px;
+  }
+
+  .purchase p {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+}
+
+@media (max-width: 360px) {
+  .brand span:last-child {
+    max-width: 108px;
+    line-height: 1.2;
+  }
+
+  .tool-button {
+    width: 42px;
+    height: 44px;
+  }
+
+  .tool-button--wide {
+    gap: 6px;
+    padding: 0 9px;
+    font-size: 11px;
   }
 }
 

@@ -11,6 +11,7 @@ const resetButton = document.querySelector("#reset");
 const shuffleButton = document.querySelector("#shuffle");
 const zoomInButton = document.querySelector("#zoom-in");
 const zoomOutButton = document.querySelector("#zoom-out");
+const focusToggle = document.querySelector("#focus-toggle");
 const toast = document.querySelector("#toast");
 
 const scene = new THREE.Scene();
@@ -189,6 +190,25 @@ function zoomCamera(factor) {
 
 zoomInButton.addEventListener("click", () => zoomCamera(0.8));
 zoomOutButton.addEventListener("click", () => zoomCamera(1.25));
+
+function setCubeFocus(isFocused) {
+  document.body.classList.toggle("is-cube-focused", isFocused);
+  experience.classList.toggle("is-focused", isFocused);
+  focusToggle.setAttribute("aria-pressed", String(isFocused));
+  focusToggle.setAttribute("aria-label", isFocused ? "Sair do foco" : "Expandir cubo");
+  focusToggle.querySelector("span").textContent = isFocused ? "Voltar" : "Focar";
+  requestAnimationFrame(resize);
+}
+
+focusToggle.addEventListener("click", () => {
+  setCubeFocus(!experience.classList.contains("is-focused"));
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && experience.classList.contains("is-focused")) {
+    setCubeFocus(false);
+  }
+});
 
 function setMode(nextMode) {
   mode = nextMode;
@@ -386,9 +406,11 @@ resetButton.addEventListener("click", () => {
 function resize() {
   const width = experience.clientWidth;
   const height = experience.clientHeight;
+  if (!width || !height) return;
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
+  controls.handleResize();
 }
 
 const resizeObserver = new ResizeObserver(resize);

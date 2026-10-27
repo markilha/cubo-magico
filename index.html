@@ -18,7 +18,6 @@
         </span>
         <span>Cubo mágico 3D</span>
       </a>
-      <a class="buy-button" href="#comprar">Comprar cubo</a>
     </header>
 
     <main>
@@ -30,27 +29,36 @@
             Observe cada face, embaralhe as cores e encontre seu caminho de volta.
             Um cubo completo, direto no navegador.
           </p>
-          <a class="primary-button" href="#comprar">
-            Comprar cubo
-            <span aria-hidden="true">↗</span>
-          </a>
         </div>
 
         <div class="experience" id="cubo" aria-label="Cubo mágico 3D interativo">
           <canvas id="cube-canvas"></canvas>
 
+          <button
+            id="focus-toggle"
+            class="focus-toggle"
+            type="button"
+            aria-label="Expandir cubo"
+            aria-pressed="false"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>
+            </svg>
+            <span>Focar</span>
+          </button>
+
           <div class="mode-switch" role="group" aria-label="Modo de interação">
-            <button class="mode-button is-active" data-mode="explore" aria-pressed="true">
+            <button class="mode-button is-active" data-mode="explore" type="button" aria-label="Explorar" title="Explorar" aria-pressed="true">
               <svg aria-hidden="true" viewBox="0 0 24 24">
                 <path d="M5 9V5a2 2 0 0 1 4 0v4-5a2 2 0 0 1 4 0v5-4a2 2 0 0 1 4 0v6-2a2 2 0 0 1 4 0v5c0 4.4-3.6 8-8 8h-1.4a8 8 0 0 1-5.7-2.3L2.6 16a2 2 0 0 1 2.8-2.8L8 15.5V9a1.5 1.5 0 0 0-3 0Z"/>
               </svg>
-              Explorar
+              <span class="mode-label">Explorar</span>
             </button>
-            <button class="mode-button" data-mode="solve" aria-pressed="false">
+            <button class="mode-button" data-mode="solve" type="button" aria-label="Resolver" title="Resolver" aria-pressed="false">
               <svg aria-hidden="true" viewBox="0 0 24 24">
                 <path d="M7 7h10v10H7zM3 3h4v4H3zm14 0h4v4h-4zM3 17h4v4H3zm14 0h4v4h-4z"/>
               </svg>
-              Resolver
+              <span class="mode-label">Resolver</span>
             </button>
           </div>
 
