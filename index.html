@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Cubo mágico 3D interativo para explorar, embaralhar e resolver."
+    />
+    <title>Cubo Mágico 3D</title>
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Cubo Mágico 3D, início">
+        <span class="brand-mark" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </span>
+        <span>Cubo mágico 3D</span>
+      </a>
+      <a class="buy-button" href="#comprar">Comprar cubo</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="copy">
+          <p class="eyebrow">Clássico. Tátil. Infinito.</p>
+          <h1>Cubo mágico 3D</h1>
+          <p class="intro">
+            Observe cada face, embaralhe as cores e encontre seu caminho de volta.
+            Um cubo completo, direto no navegador.
+          </p>
+          <a class="primary-button" href="#comprar">
+            Comprar cubo
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <div class="experience" id="cubo" aria-label="Cubo mágico 3D interativo">
+          <canvas id="cube-canvas"></canvas>
+
+          <div class="mode-switch" role="group" aria-label="Modo de interação">
+            <button class="mode-button is-active" data-mode="explore" aria-pressed="true">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M5 9V5a2 2 0 0 1 4 0v4-5a2 2 0 0 1 4 0v5-4a2 2 0 0 1 4 0v6-2a2 2 0 0 1 4 0v5c0 4.4-3.6 8-8 8h-1.4a8 8 0 0 1-5.7-2.3L2.6 16a2 2 0 0 1 2.8-2.8L8 15.5V9a1.5 1.5 0 0 0-3 0Z"/>
+              </svg>
+              Explorar
+            </button>
+            <button class="mode-button" data-mode="solve" aria-pressed="false">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M7 7h10v10H7zM3 3h4v4H3zm14 0h4v4h-4zM3 17h4v4H3zm14 0h4v4h-4z"/>
+              </svg>
+              Resolver
+            </button>
+          </div>
+
+          <div class="cube-tools" aria-label="Controles do cubo">
+            <button id="shuffle" class="tool-button tool-button--wide" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/>
+              </svg>
+              Embaralhar
+            </button>
+            <button id="undo" class="tool-button" type="button" aria-label="Desfazer" title="Desfazer">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M9 7 4 12l5 5M4 12h9a7 7 0 0 1 7 7"/>
+              </svg>
+            </button>
+            <button id="reset" class="tool-button" type="button" aria-label="Reiniciar" title="Reiniciar">
+              <svg aria-hidden="true" viewBox="0 0 24 24">
+                <path d="M20 6v5h-5M19 11a8 8 0 1 0 .5 5M20 11l-4-4"/>
+              </svg>
+            </button>
+          </div>
+
+          <p class="interaction-hint" id="interaction-hint">
+            Arraste para girar · role para aproximar
+          </p>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="purchase" id="comprar">
+        <p>Leve o desafio para as mãos.</p>
+        <a href="https://www.google.com/search?q=comprar+cubo+magico+3x3" target="_blank" rel="noreferrer">
+          Encontrar um cubo
+          <span aria-hidden="true">↗</span>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>
